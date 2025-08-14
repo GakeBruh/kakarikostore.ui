@@ -141,7 +141,7 @@ const CatalogsList = () => {
     return (
         <Layout>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-gray-800">Catálogos</h1>
+                <h1 className="text-3xl font-bold text-white-800">Catálogos</h1>
                 <button
                     onClick={handleCreate}
                     className="bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-md transition-colors"
