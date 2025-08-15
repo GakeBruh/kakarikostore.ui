@@ -44,9 +44,12 @@ const CatalogTypesList = () => {
   const handleDelete = async (item) => {
     if (!validateToken()) return;
     const message = `¿Está seguro de borrar "${item.description}"? Tiene ${item.number_of_products || 0} productos asociados. Se desactivará pero mantendrá la integridad de los datos.`;
+    
     if (window.confirm(message)) {
       await catalogTypeService.deactivate(item.id);
+      setSuccessMessage(`Tipo de catálogo desactivado exitosamente`);
       loadCatalogTypes();
+      setTimeout(() => setSuccessMessage(''), 3000);
     }
   };
 
@@ -68,7 +71,14 @@ const CatalogTypesList = () => {
       <div className="w-full flex items-center justify-center pt-2 px-0">
         <div className="container max-w-9xl">
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            {/* Header */}
+
+            {successMessage && (
+              <div className="bg-green-100 text-green-800 p-3 rounded-md mb-4 flex items-center">
+                <span className="mr-2">✅</span>
+                {successMessage}
+              </div>
+            )}
+
             <div className="p-6 border-b border-gray-200 text-center">
               <h2 className="text-xl font-bold text-gray-800">Tipos de Catálogo</h2>
               <p className="text-gray-500 mt-1">
@@ -82,7 +92,6 @@ const CatalogTypesList = () => {
               </button>
             </div>
 
-            {/* Search */}
             <div className="p-6 flex justify-center">
               <input
                 type="text"
@@ -93,21 +102,23 @@ const CatalogTypesList = () => {
               />
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200 text-lg">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-10 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ID
+                    </th>
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Descripción
                     </th>
-                    <th className="px-10 py-5 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Productos
                     </th>
-                    <th className="px-10 py-5 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Estado
                     </th>
-                    <th className="px-10 py-5 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Acciones
                     </th>
                   </tr>
@@ -116,6 +127,7 @@ const CatalogTypesList = () => {
                   {filteredCatalogs.length > 0 ? (
                     filteredCatalogs.map((item) => (
                       <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-900">{item.id}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-gray-900">{item.description}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-gray-900">{item.number_of_products || 0}</td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -147,7 +159,7 @@ const CatalogTypesList = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="px-6 py-4 text-gray-500">
+                      <td colSpan="5" className="px-6 py-4 text-gray-500">
                         No hay registros
                       </td>
                     </tr>
