@@ -43,7 +43,8 @@ const CatalogTypesList = () => {
 
   const handleDelete = async (item) => {
     if (!validateToken()) return;
-    if (window.confirm(`Eliminar ${item.description}?`)) {
+    const message = `¿Está seguro de borrar "${item.description}"? Tiene ${item.number_of_products || 0} productos asociados. Se desactivará pero mantendrá la integridad de los datos.`;
+    if (window.confirm(message)) {
       await catalogTypeService.deactivate(item.id);
       loadCatalogTypes();
     }
