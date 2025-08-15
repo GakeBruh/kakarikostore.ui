@@ -42,15 +42,34 @@ const CatalogTypesList = () => {
   };
 
   const handleDelete = async (item) => {
-    if (!validateToken()) return;
-    const message = `¿Está seguro de borrar "${item.description}"? Tiene ${item.number_of_products || 0} productos asociados. Se desactivará pero mantendrá la integridad de los datos.`;
-    
-    if (window.confirm(message)) {
-      await catalogTypeService.deactivate(item.id);
-      setSuccessMessage(`Tipo de catálogo desactivado exitosamente`);
-      loadCatalogTypes();
-      setTimeout(() => setSuccessMessage(''), 3000);
-    }
+      if (!validateToken()) {
+          return;
+      }
+
+      const hasProducts = item.number_of_products > 0;
+      const action = hasProducts ? 'desactivar' : 'eliminar';
+      const consequence = hasProducts 
+          ? `Este tipo tiene ${item.number_of_products} producto(s) asociado(s). Se desactivará pero mantendrá la integridad de los datos.`
+          : 'Este tipo será eliminado permanentemente del sistema.';
+
+      const confirmed = window.confirm(
+          `¿Estás seguro de ${action} el tipo de catálogo "${item.description}"?\n\n${consequence}\n\n¿Deseas continuar?`
+      );
+
+      if (confirmed) {
+          try {
+              setError('');
+              await catalogTypeService.deactivate(item.id);
+              await loadCatalogTypes();
+              const message = hasProducts 
+                  ? 'Tipo de catálogo desactivado exitosamente'
+                  : 'Tipo de catálogo eliminado exitosamente';
+              setSuccessMessage(message);
+          } catch (error) {
+              console.error('Error al procesar:', error);
+              setError(error.message || `Error al ${action} el tipo de catálogo`);
+          }
+      }
   };
 
   const handleFormSuccess = async () => {
@@ -148,12 +167,14 @@ const CatalogTypesList = () => {
                           >
                             Editar
                           </button>
-                          <button
-                            onClick={() => handleDelete(item)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Eliminar
-                          </button>
+                          {item.active && (
+                            <button
+                              onClick={() => handleDelete(item)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              Eliminar
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))
